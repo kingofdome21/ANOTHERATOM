@@ -713,7 +713,145 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         });
     });
+    // Atom Builder Feature
+const atomBuilderButton = document.getElementById("atom-builder-button");
+const atomBuilderModal = document.getElementById("atom-builder-modal");
+const atomBuilderClose = document.querySelector(".atom-builder-close");
+const addProtonButton = document.getElementById("add-proton-button");
+const addNeutronButton = document.getElementById("add-neutron-button");
+const addElectronButton = document.getElementById("add-electron-button");
+const protonCountElement = document.getElementById("proton-count");
+const neutronCountElement = document.getElementById("neutron-count");
+const electronCountElement = document.getElementById("electron-count");
+const elementMessageElement = document.getElementById("element-message");
+const atomBuilderNucleus = document.querySelector(".atom-builder-nucleus");
+
+let protonCount = 0;
+let neutronCount = 0;
+let electronCount = 0;
+
+// Open the Atom Builder modal
+atomBuilderButton.addEventListener("click", () => {
+    atomBuilderModal.style.display = "block";
+});
+
+// Close the modal when 'x' is clicked
+atomBuilderClose.addEventListener("click", () => {
+    atomBuilderModal.style.display = "none";
+});
+
+// Close the modal when clicking outside of it
+window.addEventListener("click", (event) => {
+    if (event.target === atomBuilderModal) {
+        atomBuilderModal.style.display = "none";
+    }
+});
+
+// Add a proton to the nucleus
+addProtonButton.addEventListener("click", () => {
+    const proton = document.createElement("div");
+    proton.className = "atom-builder-proton";
+    atomBuilderNucleus.appendChild(proton);
     
+    protonCount++;
+    protonCountElement.textContent = protonCount;
+    
+    // Adjust nucleus size based on particle count
+    updateNucleusSize();
+    
+    // Check if it matches a real element
+    checkElement();
+});
+
+// Add a neutron to the nucleus
+addNeutronButton.addEventListener("click", () => {
+    const neutron = document.createElement("div");
+    neutron.className = "atom-builder-neutron";
+    atomBuilderNucleus.appendChild(neutron);
+    
+    neutronCount++;
+    neutronCountElement.textContent = neutronCount;
+    
+    // Adjust nucleus size based on particle count
+    updateNucleusSize();
+    
+    // Update element message (just for consistency, though it doesn't affect the element)
+    checkElement();
+});
+
+// Add an electron to orbit
+addElectronButton.addEventListener("click", () => {
+    const electron = document.createElement("div");
+    electron.className = "atom-builder-electron";
+    
+    // Determine which orbit to use based on electron count
+    const orbit = electronCount < 2 ? 1 : 2;
+    
+    // Calculate position on the orbit
+    const angle = (electronCount % 8) * (Math.PI / 4); // Distribute up to 8 electrons evenly
+    const orbitSize = orbit === 1 ? 90 : 120; // Radius in pixels
+    const x = Math.cos(angle) * orbitSize;
+    const y = Math.sin(angle) * orbitSize;
+    
+    // Set electron position
+    electron.style.left = `calc(50% + ${x}px)`;
+    electron.style.top = `calc(50% + ${y}px)`;
+    
+    document.querySelector(".atom-builder-model").appendChild(electron);
+    
+    electronCount++;
+    electronCountElement.textContent = electronCount;
+    
+    // Check if it matches a real element
+    checkElement();
+});
+
+// Update nucleus size based on proton and neutron count
+function updateNucleusSize() {
+    const totalParticles = protonCount + neutronCount;
+    
+    if (totalParticles <= 2) {
+        atomBuilderNucleus.style.width = "80px";
+        atomBuilderNucleus.style.height = "80px";
+    } else if (totalParticles <= 10) {
+        atomBuilderNucleus.style.width = "100px";
+        atomBuilderNucleus.style.height = "100px";
+    } else {
+        atomBuilderNucleus.style.width = "120px";
+        atomBuilderNucleus.style.height = "120px";
+    }
+}
+
+// Check if the built atom matches a real element
+function checkElement() {
+    let elementName = "";
+    let elementSymbol = "";
+    
+    switch(protonCount) {
+        case 1:
+            elementName = "Hydrogen";
+            elementSymbol = "H";
+            break;
+        case 2:
+            elementName = "Helium";
+            elementSymbol = "He";
+            break;
+        case 3:
+            elementName = "Lithium";
+            elementSymbol = "Li";
+            break;
+        // Add more elements as needed
+    }
+    
+    if (elementName) {
+        elementMessageElement.textContent = `You've built ${elementName} (${elementSymbol})!`;
+        elementMessageElement.style.display = "block";
+    } else {
+        elementMessageElement.textContent = "";
+        elementMessageElement.style.display = "none";
+    }
+}
+
     // Initialize with default language
     updateLanguage("en");
     // Ensure home view is shown initially
